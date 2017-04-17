@@ -6,10 +6,10 @@ import pickle
 class PickIt(object):
     def __init__(self, pickle_file_name, n = -1):
         self.fp = open(pickle_file_name, "rb")
-        self.loadmax = n
+        self._max = n
+        self.idx = self._max
 
     def __iter__(self, ):
-        self.idx = self.loadmax
         return self
 
     def __next__(self, ):
@@ -19,7 +19,8 @@ class PickIt(object):
                 ret = pickle.load(self.fp)
                 self.idx -= 1
             except:
-                self.fp.close()
+                self.__del__()
+                raise StopIteration
         else:
             raise StopIteration
         return ret
