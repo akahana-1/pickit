@@ -3,27 +3,40 @@
 
 import pickle
 
+
 class PickIt(object):
-    def __init__(self, pickle_file_name, n = -1):
+    """
+    Iterator for Pickle dumped file
+    """
+    def __init__(self, pickle_file_name, n=-1):
         self.fp = open(pickle_file_name, "rb")
-        self._max = n
-        self.idx = self._max
+        self.limit = n
 
     def __iter__(self, ):
+        self.c = self.limit
         return self
 
     def __next__(self, ):
         ret = None
-        if self.idx != 0:
-            try:
-                ret = pickle.load(self.fp)
-                self.idx -= 1
-            except:
-                self.__del__()
-                raise StopIteration
-        else:
+        if self.c == 0:
             raise StopIteration
+        try:
+            ret = pickle.load(self.fp)
+        except:
+            self.fp.close()
+            raise StopIteration
+        self.c -= 1
         return ret
 
-    def __del__(self, ):
-        self.fp.close()
+
+if __name__ == '__main__':
+    """
+    Self Test
+    """
+    import sys
+
+    filename = sys.argv[1]
+    c = 0
+    for _ in PickIt(filename):
+        c += 1
+    print(c)
